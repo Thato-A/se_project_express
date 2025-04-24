@@ -46,7 +46,8 @@ const getUser = (req, res) => {
         return res
           .status(NOT_FOUND_ERROR)
           .send({ message: "Incorrect user Id", err });
-      } else if (err.name === "CastError") {
+      }
+      if (err.name === "CastError") {
         return res
           .status(INVALID_DATA_ERROR)
           .send({ message: "Incorrect user Id", err });

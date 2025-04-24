@@ -1,7 +1,10 @@
 const mongoose = require("mongoose");
 const validator = require("validator");
 
-const { ObjectId } = mongoose.Types.ObjectId;
+const {
+  Schema,
+  Types: { ObjectId },
+} = mongoose;
 
 const clothingItemSchema = new mongoose.Schema({
   name: {
