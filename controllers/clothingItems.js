@@ -1,5 +1,9 @@
 const ClothingItem = require("../models/clothingItems");
-const { DEFAULT_ERROR, INVALID_DATA_ERROR } = require("../utils/errors");
+const {
+  DEFAULT_ERROR,
+  INVALID_DATA_ERROR,
+  NOT_FOUND_ERROR,
+} = require("../utils/errors");
 
 const createItem = (req, res) => {
   console.log(req.body);
@@ -25,15 +29,14 @@ const createItem = (req, res) => {
 };
 
 const getItems = (req, res) => {
-  ClothingItem.find().then((item) => {
-    res
-      .status(200)
-      .send(item)
-      .catch((err) => {
-        console.error(err);
-        res.status(DEFAULT_ERROR).send({ message: "Item not found", err });
-      });
-  });
+  ClothingItem.find()
+    .then((item) => {
+      res.status(200).send(item);
+    })
+    .catch((err) => {
+      console.error(err);
+      res.status(NOT_FOUND_ERROR).send({ message: "Item not found", err });
+    });
 };
 
 const updateItem = (req, res) => {
@@ -43,15 +46,11 @@ const updateItem = (req, res) => {
   ClothingItem.findByIdAndUpdate(itemId, { $set: { imageUrl } })
     .orFail()
     .then((item) => {
-      res
-        .status(200)
-        .send({ data: item })
-        .catch((err) => {
-          console.error(err);
-          res
-            .status(DEFAULT_ERROR)
-            .send({ message: "Update unsuccessful", err });
-        });
+      res.status(200).send({ data: item });
+    })
+    .catch((err) => {
+      console.error(err);
+      res.status(DEFAULT_ERROR).send({ message: "Update unsuccessful", err });
     });
 };
 
@@ -62,15 +61,18 @@ const deleteItem = (req, res) => {
   ClothingItem.findByIdAndDelete(itemId)
     .orFail()
     .then(() => {
-      res
-        .status(204)
-        .send({})
-        .catch((err) => {
-          console.error(err);
-          res
-            .status(DEFAULT_ERROR)
-            .send({ message: "Item delete unsuccessful", err });
-        });
+      res.status(200).send({});
+    })
+    .catch((err) => {
+      console.error(err);
+      if (err.name === "CastError") {
+        return res
+          .status(INVALID_DATA_ERROR)
+          .send({ message: "input is incorrect", err });
+      }
+      return res
+        .status(NOT_FOUND_ERROR)
+        .send({ message: "input was not found", err });
     });
 };
 
@@ -82,15 +84,18 @@ const likeItem = (req, res) => {
   )
     .orFail()
     .then((itemId) => {
-      res
-        .status(201)
-        .send(itemId)
-        .catch((err) => {
-          console.error(err);
-          res
-            .status(DEFAULT_ERROR)
-            .send({ message: "Item was not liked", err });
-        });
+      res.status(201).send(itemId);
+    })
+    .catch((err) => {
+      console.error(err);
+      if (err.name === "CastError") {
+        return res
+          .status(INVALID_DATA_ERROR)
+          .send({ message: "input is incorrect", err });
+      }
+      return res
+        .status(NOT_FOUND_ERROR)
+        .send({ message: "input was not found", err });
     });
 };
 
@@ -102,15 +107,18 @@ const dislikeItem = (req, res) => {
   )
     .orFail()
     .then(() => {
-      res
-        .status(204)
-        .send({})
-        .catch((err) => {
-          console.error(err);
-          res
-            .status(DEFAULT_ERROR)
-            .send({ message: "dislike was unsuccessful", err });
-        });
+      res.status(200).send({});
+    })
+    .catch((err) => {
+      console.error(err);
+      if (err.name === "CastError") {
+        return res
+          .status(INVALID_DATA_ERROR)
+          .send({ message: "input is incorrect", err });
+      }
+      return res
+        .status(NOT_FOUND_ERROR)
+        .send({ message: "input was not found", err });
     });
 };
 
