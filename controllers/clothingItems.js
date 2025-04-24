@@ -1,9 +1,5 @@
 const ClothingItem = require("../models/clothingItems");
-const {
-  DEFAULT_ERROR,
-  INVALID_DATA_ERROR,
-  NOT_FOUND_ERROR,
-} = require("../utils/errors");
+const statusCodes = require("../utils/errors");
 
 const createItem = (req, res) => {
   console.log(req.body);
@@ -19,38 +15,25 @@ const createItem = (req, res) => {
 
       if (err.name === "ValidationError") {
         return res
-          .status(INVALID_DATA_ERROR)
-          .send({ message: "Item creation unsuccesful", err });
+          .status(statusCodes.INVALID_DATA_ERROR)
+          .send({ message: "Input is incorrect" });
       }
       return res
-        .status(DEFAULT_ERROR)
-        .send({ message: "Item creation unsuccesful", err });
+        .status(statusCodes.INTERNAL_SERVER_ERROR)
+        .send({ message: "Item creation unsuccesful" });
     });
 };
 
 const getItems = (req, res) => {
   ClothingItem.find()
     .then((item) => {
-      res.status(200).send(item);
+      res.status(statusCodes.OK).send(item);
     })
     .catch((err) => {
       console.error(err);
-      res.status(NOT_FOUND_ERROR).send({ message: "Item not found", err });
-    });
-};
-
-const updateItem = (req, res) => {
-  const { itemId } = req.params;
-  const { imageUrl } = req.body;
-
-  ClothingItem.findByIdAndUpdate(itemId, { $set: { imageUrl } })
-    .orFail()
-    .then((item) => {
-      res.status(200).send({ data: item });
-    })
-    .catch((err) => {
-      console.error(err);
-      res.status(DEFAULT_ERROR).send({ message: "Update unsuccessful", err });
+      res
+        .status(statusCodes.NOT_FOUND_ERROR)
+        .send({ message: "Item not found" });
     });
 };
 
@@ -61,18 +44,23 @@ const deleteItem = (req, res) => {
   ClothingItem.findByIdAndDelete(itemId)
     .orFail()
     .then(() => {
-      res.status(200).send({});
+      res.status(statusCodes.OK).send({ message: "Item successfully deleted" });
     })
     .catch((err) => {
       console.error(err);
       if (err.name === "CastError") {
         return res
-          .status(INVALID_DATA_ERROR)
-          .send({ message: "input is incorrect", err });
+          .status(statusCodes.INVALID_DATA_ERROR)
+          .send({ message: "Input is incorrect" });
+      }
+      if (err.name === "DocumentNotFoundError") {
+        return res
+          .status(statusCodes.NOT_FOUND_ERROR)
+          .send({ message: "Input was not found" });
       }
       return res
-        .status(NOT_FOUND_ERROR)
-        .send({ message: "input was not found", err });
+        .status(statusCodes.INTERNAL_SERVER_ERROR)
+        .send({ message: "Input was not found" });
     });
 };
 
@@ -84,18 +72,23 @@ const likeItem = (req, res) => {
   )
     .orFail()
     .then((itemId) => {
-      res.status(201).send(itemId);
+      res.status(statusCodes.CREATED).send(itemId);
     })
     .catch((err) => {
       console.error(err);
       if (err.name === "CastError") {
         return res
-          .status(INVALID_DATA_ERROR)
-          .send({ message: "input is incorrect", err });
+          .status(statusCodes.INVALID_DATA_ERROR)
+          .send({ message: "Input is incorrect" });
+      }
+      if (err.name === "DocumentNotFoundError") {
+        return res
+          .status(statusCodes.NOT_FOUND_ERROR)
+          .send({ message: "Input was not found" });
       }
       return res
-        .status(NOT_FOUND_ERROR)
-        .send({ message: "input was not found", err });
+        .status(statusCodes.INTERNAL_SERVER_ERROR)
+        .send({ message: "Input was not found" });
     });
 };
 
@@ -107,25 +100,31 @@ const dislikeItem = (req, res) => {
   )
     .orFail()
     .then(() => {
-      res.status(200).send({});
+      res
+        .status(statusCodes.OK)
+        .send({ message: "Item was sucessfully disliked" });
     })
     .catch((err) => {
       console.error(err);
       if (err.name === "CastError") {
         return res
-          .status(INVALID_DATA_ERROR)
-          .send({ message: "input is incorrect", err });
+          .status(statusCodes.INVALID_DATA_ERROR)
+          .send({ message: "Input is incorrect" });
+      }
+      if (err.name === "DocumentNotFoundError") {
+        return res
+          .status(statusCodes.NOT_FOUND_ERROR)
+          .send({ message: "Input was not found" });
       }
       return res
-        .status(NOT_FOUND_ERROR)
-        .send({ message: "input was not found", err });
+        .status(statusCodes.INTERNAL_SERVER_ERROR)
+        .send({ message: "Input was not found" });
     });
 };
 
 module.exports = {
   createItem,
   getItems,
-  updateItem,
   deleteItem,
   likeItem,
   dislikeItem,
