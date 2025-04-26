@@ -2,7 +2,7 @@ const bcrypt = require("bcryptjs");
 const User = require("../models/user");
 const statusCodes = require("../utils/errors");
 const jwt = require("jsonwebtoken");
-const JWT_SECRET = require("../utils/config");
+const { JWT_SECRET } = require("../utils/config");
 
 const login = (req, res) => {
   const { email, password } = req.body;
@@ -66,9 +66,9 @@ const createUser = (req, res) => {
 };
 
 const getCurrentUser = (req, res) => {
-  const { userId } = req.user;
+  const { _id } = req.user;
 
-  User.findById(userId)
+  User.findById(_id) //req.user._id
     .orFail()
     .then((user) => {
       res.status(statusCodes.OK).send(user);
@@ -93,7 +93,11 @@ const getCurrentUser = (req, res) => {
 
 const updateUser = (req, res) => {
   const { name, avatar } = req.body;
-  User.findOneAndUpdate({ $set: { name, avatar } })
+  User.findByIdAndUpdate(
+    req.user._id,
+    { name, avatar },
+    { new: true, runValidators: true }
+  )
     .orFail()
     .then((user) => {
       res.status(statusCodes.OK).send(user);
