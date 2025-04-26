@@ -43,8 +43,17 @@ const deleteItem = (req, res) => {
 
   ClothingItem.findByIdAndDelete(itemId)
     .orFail()
-    .then(() => {
-      res.status(statusCodes.OK).send({ message: "Item successfully deleted" });
+    .then((item) => {
+      if (String(item.owner) !== req.user._id) {
+        return res
+          .status(statusCodes.FORBIDDEN_ERROR)
+          .send({ message: "You cannot delete this item" });
+      }
+      return item
+        .deleteOne()
+        .then(() =>
+          res.status(statusCodes.OK).send({ message: "Successfully deleted" })
+        );
     })
     .catch((err) => {
       console.error(err);
