@@ -23,9 +23,14 @@ const login = (req, res) => {
     })
     .catch((err) => {
       console.error(err);
+      if (err.message === "Incorrect password or email") {
+        return res
+          .status(statusCodes.UNAUTHORIZED_ERROR)
+          .send({ message: "Incorrect password or email" });
+      }
       return res
-        .status(statusCodes.UNAUTHORIZED_ERROR)
-        .send({ message: "Unauthorized entry" });
+        .status(statusCodes.INTERNAL_SERVER_ERROR)
+        .send({ message: "Incorrect password or email" });
     });
 };
 
@@ -104,12 +109,17 @@ const updateUser = (req, res) => {
     })
     .catch((err) => {
       if (err.name === "ValidationError") {
-        res
+        return res
           .status(statusCodes.INVALID_DATA_ERROR)
           .send({ message: "Invalid entry" });
       }
+      if (err.name === "DocumentNotFoundError") {
+        return res
+          .status(statusCodes.NOT_FOUND_ERROR)
+          .send({ message: "Not found" });
+      }
       return res
-        .status(statusCodes.NOT_FOUND_ERROR)
+        .status(statusCodes.INTERNAL_SERVER_ERROR)
         .send({ message: "Not found" });
     });
 };
