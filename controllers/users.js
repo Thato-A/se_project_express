@@ -1,7 +1,7 @@
 const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 const User = require("../models/user");
 const statusCodes = require("../utils/errors");
-const jwt = require("jsonwebtoken");
 const { JWT_SECRET } = require("../utils/config");
 
 const login = (req, res) => {
@@ -13,7 +13,7 @@ const login = (req, res) => {
       .send({ message: "Email and password are required" });
   }
 
-  User.findUserByCredentials(email, password)
+  return User.findUserByCredentials(email, password)
 
     .then((user) => {
       const token = jwt.sign({ _id: user._id }, JWT_SECRET, {
@@ -23,7 +23,7 @@ const login = (req, res) => {
     })
     .catch((err) => {
       console.error(err);
-      res
+      return res
         .status(statusCodes.UNAUTHORIZED_ERROR)
         .send({ message: "Unauthorized entry" });
     });
@@ -68,7 +68,7 @@ const createUser = (req, res) => {
 const getCurrentUser = (req, res) => {
   const { _id } = req.user;
 
-  User.findById(_id) //req.user._id
+  User.findById(_id)
     .orFail()
     .then((user) => {
       res.status(statusCodes.OK).send(user);

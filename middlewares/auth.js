@@ -1,10 +1,10 @@
-const { JWT_SECRET } = require("../utils/config");
 const jwt = require("jsonwebtoken");
+const { JWT_SECRET } = require("../utils/config");
 const statusCodes = require("../utils/errors");
 
 const authMiddleware = (req, res, next) => {
   try {
-    const authorization = req.headers.authorization;
+    const { authorization } = req.headers;
     if (!authorization || !authorization.startsWith("Bearer ")) {
       return res
         .status(statusCodes.UNAUTHORIZED_ERROR)
@@ -17,7 +17,7 @@ const authMiddleware = (req, res, next) => {
     req.user = payload;
     next();
   } catch (err) {
-    res
+    return res
       .status(statusCodes.UNAUTHORIZED_ERROR)
       .send({ message: "Authorization required" });
   }
