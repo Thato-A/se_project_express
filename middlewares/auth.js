@@ -15,7 +15,7 @@ const authMiddleware = (req, res, next) => {
     const payload = jwt.verify(token, JWT_SECRET);
 
     req.user = payload;
-    next();
+    return next();
   } catch (err) {
     return res
       .status(statusCodes.UNAUTHORIZED_ERROR)
