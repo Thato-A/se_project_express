@@ -38,9 +38,10 @@ const createUser = (req, res) => {
   const { name, avatar, email, password } = req.body;
 
   if (!email || !password) {
-    return res
+    res
       .status(statusCodes.INVALID_DATA_ERROR)
       .send({ message: "The email and password fields are requried" });
+    return;
   }
 
   bcrypt
@@ -54,16 +55,15 @@ const createUser = (req, res) => {
     .catch((err) => {
       console.error(err);
       if (err.code === 11000) {
-        return res
+        res
           .status(statusCodes.CONFLICT_ERROR)
           .send({ message: "Email already exists" });
-      }
-      if (err.name === "ValidationError") {
-        return res
+      } else if (err.name === "ValidationError") {
+        res
           .status(statusCodes.INVALID_DATA_ERROR)
           .send({ message: "Invalid input" });
       }
-      return res
+      res
         .status(statusCodes.INTERNAL_SERVER_ERROR)
         .send({ message: "user creation unsuccesful" });
     });
