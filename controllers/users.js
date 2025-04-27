@@ -55,15 +55,16 @@ const createUser = (req, res) => {
     .catch((err) => {
       console.error(err);
       if (err.code === 11000) {
-        res
+        return res
           .status(statusCodes.CONFLICT_ERROR)
           .send({ message: "Email already exists" });
-      } else if (err.name === "ValidationError") {
-        res
+      }
+      if (err.name === "ValidationError") {
+        return res
           .status(statusCodes.INVALID_DATA_ERROR)
           .send({ message: "Invalid input" });
       }
-      res
+      return res
         .status(statusCodes.INTERNAL_SERVER_ERROR)
         .send({ message: "user creation unsuccesful" });
     });
