@@ -23,14 +23,14 @@ const login = (req, res) => {
     })
     .catch((err) => {
       console.error(err);
-      if (err.message === "Incorrect password or email") {
+      if (err.message === "Incorrect email or password") {
         return res
           .status(statusCodes.UNAUTHORIZED_ERROR)
           .send({ message: "Incorrect password or email" });
       }
       return res
         .status(statusCodes.INTERNAL_SERVER_ERROR)
-        .send({ message: "Incorrect password or email" });
+        .send({ message: "Something went wrong, please try again later" });
     });
 };
 
@@ -38,10 +38,9 @@ const createUser = (req, res) => {
   const { name, avatar, email, password } = req.body;
 
   if (!email || !password) {
-    res
+    return res
       .status(statusCodes.INVALID_DATA_ERROR)
       .send({ message: "The email and password fields are requried" });
-    return;
   }
 
   bcrypt
