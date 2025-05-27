@@ -8,7 +8,7 @@ const createItem = (req, res) => {
 
   ClothingItem.create({ name, weather, imageUrl, owner })
     .then((item) => {
-      res.send({ data: item });
+      res.send(item);
     })
     .catch((err) => {
       console.error(err);
@@ -26,8 +26,8 @@ const createItem = (req, res) => {
 
 const getItems = (req, res) => {
   ClothingItem.find()
-    .then((item) => {
-      res.status(statusCodes.OK).send(item);
+    .then((items) => {
+      res.status(statusCodes.OK).send(items);
     })
     .catch((err) => {
       console.error(err);
@@ -39,7 +39,6 @@ const getItems = (req, res) => {
 
 const deleteItem = (req, res) => {
   const { itemId } = req.params;
-  console.log(itemId);
 
   ClothingItem.findById(itemId)
     .orFail()
@@ -108,10 +107,8 @@ const dislikeItem = (req, res) => {
     { new: true }
   )
     .orFail()
-    .then(() => {
-      res
-        .status(statusCodes.OK)
-        .send({ message: "Item was sucessfully disliked" });
+    .then((item) => {
+      res.status(statusCodes.OK).send(item);
     })
     .catch((err) => {
       console.error(err);
