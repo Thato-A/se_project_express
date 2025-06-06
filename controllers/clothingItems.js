@@ -1,8 +1,10 @@
+const BadRequestError = require("../errors/bad-request-err");
+const ForbiddenError = require("../errors/forbidden-err");
+const NotFoundError = require("../errors/not-found-err");
 const ClothingItem = require("../models/clothingItems");
 const statusCodes = require("../utils/errors");
 
-const createItem = (req, res) => {
-  console.log(req.body);
+const createItem = (req, res, next) => {
   const { name, weather, imageUrl } = req.body;
   const owner = req.user._id;
 
@@ -14,39 +16,29 @@ const createItem = (req, res) => {
       console.error(err);
 
       if (err.name === "ValidationError") {
-        return res
-          .status(statusCodes.INVALID_DATA_ERROR)
-          .send({ message: "Input is incorrect" });
+        return next(new BadRequestError("Input is incorrect"));
+      } else {
+        next(err);
       }
-      return res
-        .status(statusCodes.INTERNAL_SERVER_ERROR)
-        .send({ message: "Item creation unsuccesful" });
     });
 };
 
-const getItems = (req, res) => {
+const getItems = (req, res, next) => {
   ClothingItem.find()
     .then((items) => {
       res.status(statusCodes.OK).send(items);
     })
-    .catch((err) => {
-      console.error(err);
-      res
-        .status(statusCodes.INTERNAL_SERVER_ERROR)
-        .send({ message: "Item not found" });
-    });
+    .catch(next);
 };
 
-const deleteItem = (req, res) => {
+const deleteItem = (req, res, next) => {
   const { itemId } = req.params;
 
-  ClothingItem.findById(itemId)
+  return ClothingItem.findById(itemId)
     .orFail()
     .then((item) => {
       if (String(item.owner) !== req.user._id) {
-        return res
-          .status(statusCodes.FORBIDDEN_ERROR)
-          .send({ message: "You cannot delete this item" });
+        return next(new ForbiddenError("You cannot delete this item"));
       }
       return item
         .deleteOne()
@@ -57,22 +49,16 @@ const deleteItem = (req, res) => {
     .catch((err) => {
       console.error(err);
       if (err.name === "CastError") {
-        return res
-          .status(statusCodes.INVALID_DATA_ERROR)
-          .send({ message: "Input is incorrect" });
+        return next(new BadRequestError("Input is incorrect"));
       }
       if (err.name === "DocumentNotFoundError") {
-        return res
-          .status(statusCodes.NOT_FOUND_ERROR)
-          .send({ message: "Input was not found" });
+        return next(new NotFoundError("Input was not found"));
       }
-      return res
-        .status(statusCodes.INTERNAL_SERVER_ERROR)
-        .send({ message: "Input was not found" });
+      next(err);
     });
 };
 
-const likeItem = (req, res) => {
+const likeItem = (req, res, next) => {
   ClothingItem.findByIdAndUpdate(
     req.params.itemId,
     { $addToSet: { likes: req.user._id } },
@@ -85,22 +71,17 @@ const likeItem = (req, res) => {
     .catch((err) => {
       console.error(err);
       if (err.name === "CastError") {
-        return res
-          .status(statusCodes.INVALID_DATA_ERROR)
-          .send({ message: "Input is incorrect" });
+        return next(new BadRequestError("Input is incorrect"));
       }
       if (err.name === "DocumentNotFoundError") {
-        return res
-          .status(statusCodes.NOT_FOUND_ERROR)
-          .send({ message: "Input was not found" });
+        return next(new NotFoundError("Input was not found"));
+      } else {
+        next(err);
       }
-      return res
-        .status(statusCodes.INTERNAL_SERVER_ERROR)
-        .send({ message: "Input was not found" });
     });
 };
 
-const dislikeItem = (req, res) => {
+const dislikeItem = (req, res, next) => {
   ClothingItem.findByIdAndUpdate(
     req.params.itemId,
     { $pull: { likes: req.user._id } },
@@ -113,18 +94,13 @@ const dislikeItem = (req, res) => {
     .catch((err) => {
       console.error(err);
       if (err.name === "CastError") {
-        return res
-          .status(statusCodes.INVALID_DATA_ERROR)
-          .send({ message: "Input is incorrect" });
+        return next(new BadRequestError("Input is incorrect"));
       }
       if (err.name === "DocumentNotFoundError") {
-        return res
-          .status(statusCodes.NOT_FOUND_ERROR)
-          .send({ message: "Input was not found" });
+        return next(new NotFoundError("Input was not found"));
+      } else {
+        next(err);
       }
-      return res
-        .status(statusCodes.INTERNAL_SERVER_ERROR)
-        .send({ message: "Input was not found" });
     });
 };
 
