@@ -13,6 +13,10 @@ Custom error class
 Error handling with appropriate http status codes and responses
 Request authorization
 
+## Domain name
+
+www.wtwear.crabdance.com
+
 ## Frontend Link
 
 (https://github.com/Thato-A/se_project_react)

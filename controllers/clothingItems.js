@@ -17,9 +17,8 @@ const createItem = (req, res, next) => {
 
       if (err.name === "ValidationError") {
         return next(new BadRequestError("Input is incorrect"));
-      } else {
-        next(err);
       }
+      next(err);
     });
 };
 
@@ -75,9 +74,8 @@ const likeItem = (req, res, next) => {
       }
       if (err.name === "DocumentNotFoundError") {
         return next(new NotFoundError("Input was not found"));
-      } else {
-        next(err);
       }
+      next(err);
     });
 };
 
@@ -98,9 +96,8 @@ const dislikeItem = (req, res, next) => {
       }
       if (err.name === "DocumentNotFoundError") {
         return next(new NotFoundError("Input was not found"));
-      } else {
-        next(err);
       }
+      next(err);
     });
 };
 

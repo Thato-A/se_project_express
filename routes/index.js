@@ -9,7 +9,7 @@ router.use("/items", itemRouter);
 router.post("/signin", login);
 router.post("/signup", createUser);
 
-router.use((req, res) => {
+router.use(() => {
   throw new NotFoundError("Router not found");
 });
 
