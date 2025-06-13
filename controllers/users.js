@@ -2,7 +2,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/user");
 const { JWT_SECRET } = require("../utils/config");
-const { statusCodes } = require("../utils/errors");
+const statusCodes = require("../utils/errors");
 const BadRequestError = require("../errors/bad-request-err");
 const UnauthorizedError = require("../errors/unauthorized-err");
 const ConflictError = require("../errors/conflict-err");
@@ -25,7 +25,7 @@ const login = (req, res, next) => {
     .catch((err) => {
       console.error(err);
       if (err.message === "Incorrect email or password") {
-        next(new (UnauthorizedError("Incorrect email or password"))());
+        next(new UnauthorizedError("Incorrect email or password"));
       }
       next(err);
     });
