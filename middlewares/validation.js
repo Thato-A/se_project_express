@@ -22,7 +22,7 @@ const validateItemBody = celebrate({
       "string.uri": 'The "imageUrl" field must be a valid url',
     }),
 
-    weather: Joi.string().valid("hot", "warm", "cold").required().message({
+    weather: Joi.string().valid("hot", "warm", "cold").required().messages({
       "string.empty": 'The "weather" field must be selected',
     }),
   }),
