@@ -10,7 +10,7 @@ const authMiddleware = require("../middlewares/auth");
 const { validateItemBody, validateId } = require("../middlewares/validation");
 
 router.post("/", authMiddleware, validateItemBody, createItem);
-router.get("/", validateItemBody, getItems);
+router.get("/", getItems);
 router.delete("/:itemId", authMiddleware, validateId, deleteItem);
 router.put("/:itemId/likes", authMiddleware, validateId, likeItem);
 router.delete("/:itemId/likes", authMiddleware, validateId, dislikeItem);
